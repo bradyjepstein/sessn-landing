@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sessn — Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      --accent: #635BFF;
+      --accent-light: #8B85FF;
+      --accent-glow: rgba(99, 91, 255, 0.35);
+      --accent-soft: rgba(99, 91, 255, 0.12);
+      --accent-border: rgba(99, 91, 255, 0.25);
+      --card-bg: #151515;
+      --card-border: rgba(255,255,255,0.06);
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px 0; font-size: 12px; font-weight: 600;
+    }
+    .status-time { font-size: 15px; font-weight: 700; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { width: 16px; height: 16px; fill: #fff; }
+
+    /* ── Search Bar ── */
+    .search-container {
+      padding: 16px 16px 8px;
+    }
+    .search-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      transition: border-color 0.2s;
+    }
+    .search-bar:focus-within {
+      border-color: var(--accent-border);
+    }
+    .search-bar svg {
+      width: 20px; height: 20px;
+      fill: rgba(255,255,255,0.35);
+      flex-shrink: 0;
+    }
+    .search-bar input {
+      flex: 1;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px; font-weight: 500;
+      color: #fff;
+    }
+    .search-bar input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+    .search-bar .clear-btn {
+      width: 20px; height: 20px;
+      background: rgba(255,255,255,0.12);
+      border: none; border-radius: 50%;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .search-bar .clear-btn svg {
+      width: 12px; height: 12px;
+      fill: rgba(255,255,255,0.5);
+    }
+    .search-bar input:not(:placeholder-shown) ~ .clear-btn {
+      display: flex;
+    }
+
+    /* ── Filter Chips ── */
+    .filter-chips {
+      display: flex; gap: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px; font-weight: 600;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .chip.active {
+      background: var(--accent-soft);
+      color: var(--accent-light);
+      border-color: var(--accent-border);
+    }
+    .chip:hover:not(.active) {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ── Section Header ── */
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 20px 12px;
+    }
+    .section-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 2px;
+    }
+    .section-header .see-all {
+      font-size: 13px; font-weight: 600; color: var(--accent-light); cursor: pointer;
+    }
+
+    /* ── Trending Workouts ── */
+    .trending-scroll {
+      display: flex; gap: 12px;
+      padding: 0 16px 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .trending-scroll::-webkit-scrollbar { display: none; }
+    .trending-card {
+      flex-shrink: 0;
+      width: 160px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .trending-card:active { transform: scale(0.97); }
+    .trending-img {
+      width: 100%; height: 120px;
+      object-fit: cover; display: block;
+    }
+    .trending-info {
+      padding: 10px 12px;
+    }
+    .trending-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .trending-meta {
+      font-size: 11px; color: rgba(255,255,255,0.4);
+    }
+
+    /* ── Recent Searches ── */
+    .recent-list {
+      padding: 0 16px 8px;
+      display: flex; flex-direction: column;
+    }
+    .recent-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+      transition: background 0.15s;
+      border-radius: 8px;
+    }
+    .recent-item:hover { background: rgba(255,255,255,0.03); }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .recent-icon svg { width: 18px; height: 18px; fill: rgba(255,255,255,0.4); }
+    .recent-text { flex: 1; }
+    .recent-text strong {
+      display: block; font-size: 14px; font-weight: 600; color: #fff;
+    }
+    .recent-text span {
+      font-size: 12px; color: rgba(255,255,255,0.35);
+    }
+    .recent-remove {
+      background: none; border: none; cursor: pointer;
+      padding: 4px;
+    }
+    .recent-remove svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.2); }
+    .recent-remove:hover svg { fill: rgba(255,255,255,0.5); }
+
+    /* ── Popular Splits ── */
+    .splits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 16px 120px;
+    }
+    .split-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .split-card:active { transform: scale(0.97); }
+    .split-card:hover { border-color: var(--accent-border); }
+    .split-emoji { font-size: 28px; margin-bottom: 8px; }
+    .split-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .split-count {
+      font-size: 11px; color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Bottom Nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 8px 12px 28px; z-index: 100;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; padding: 6px 12px; transition: color 0.2s;
+    }
+    .nav-item svg { width: 24px; height: 24px; fill: rgba(255,255,255,0.35); }
+    .nav-item span { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 500; }
+    .nav-item.active svg { fill: var(--accent-light); }
+    .nav-item.active span { color: var(--accent-light); }
+    .nav-add {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -24px; cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-add:hover { transform: scale(1.08); box-shadow: 0 6px 28px var(--accent-glow); }
+    .nav-add svg { width: 28px; height: 28px; fill: #fff; }
+
+    ::-webkit-scrollbar { width: 0; }
+
+    @media (min-width: 500px) {
+      body {
+        border-left: 3px solid rgba(255,255,255,0.08);
+        border-right: 3px solid rgba(255,255,255,0.08);
+        box-shadow: 0 0 80px rgba(0,0,0,0.5);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.34C7 21.4 7.6 22 8.33 22h7.34c.73 0 1.33-.6 1.33-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- SESSN Logo -->
+  <div style="padding: 18px 20px 0; text-align: center;">
+    <span style="font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 4px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SESSN</span>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="text" placeholder="Search workouts, people, splits..." autofocus>
+      <button class="clear-btn" onclick="clearSearch()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Chips -->
+  <div class="filter-chips">
+    <div class="chip active" onclick="setChip(this)">All</div>
+    <div class="chip" onclick="setChip(this)">Workouts</div>
+    <div class="chip" onclick="setChip(this)">People</div>
+    <div class="chip" onclick="setChip(this)">Splits</div>
+    <div class="chip" onclick="setChip(this)">Gyms</div>
+  </div>
+
+  <!-- Trending Workouts -->
+  <div class="section-header">
+    <h2>TRENDING</h2>
+    <span class="see-all">See all</span>
+  </div>
+  <div class="trending-scroll">
+    <div class="trending-card">
+      <img class="trending-img" src="Images/post-thanksgiving.jpg" alt="Push Day" style="object-position: center 30%;">
+      <div class="trending-info">
+        <div class="trending-title">PUSH DAY PUMP</div>
+        <div class="trending-meta">1.2k saves this week</div>
+      </div>
+    </div>
+    <div class="trending-card">
+      <img class="trending-img" src="Images/pull-day.jpg" alt="Pull Day" style="object-position: center 55%;">
+      <div class="trending-info">
+        <div class="trending-title">BACK DESTROYER</div>
+        <div class="trending-meta">980 saves this week</div>
+      </div>
+    </div>
+    <div class="trending-card">
+      <img class="trending-img" src="Images/leg-day.jpg" alt="Leg Day" style="object-position: center 15%;">
+      <div class="trending-info">
+        <div class="trending-title">LEG DAY BURNER</div>
+        <div class="trending-meta">870 saves this week</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Searches -->
+  <div class="section-header">
+    <h2>RECENT SEARCHES</h2>
+    <span class="see-all" onclick="clearAllRecent()">Clear all</span>
+  </div>
+  <div class="recent-list">
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 3C8.03 3 4 7.03 4 12H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      </div>
+      <div class="recent-text">
+        <strong>Push Pull Legs</strong>
+        <span>Split</span>
+      </div>
+      <button class="recent-remove" onclick="this.parentElement.remove()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <div class="recent-text">
+        <strong>lydiakoehler</strong>
+        <span>Person</span>
+      </div>
+      <button class="recent-remove" onclick="this.parentElement.remove()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="recent-item">
+      <div class="recent-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 3C8.03 3 4 7.03 4 12H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0013 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      </div>
+      <div class="recent-text">
+        <strong>Chest & Triceps</strong>
+        <span>Split</span>
+      </div>
+      <button class="recent-remove" onclick="this.parentElement.remove()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Popular Splits -->
+  <div class="section-header">
+    <h2>POPULAR SPLITS</h2>
+  </div>
+  <div class="splits-grid">
+    <div class="split-card">
+      <div class="split-emoji">&#128170;</div>
+      <div class="split-name">CHEST & TRIS</div>
+      <div class="split-count">4.2k workouts</div>
+    </div>
+    <div class="split-card">
+      <div class="split-emoji">&#129470;</div>
+      <div class="split-name">BACK & BIS</div>
+      <div class="split-count">3.8k workouts</div>
+    </div>
+    <div class="split-card">
+      <div class="split-emoji">&#129461;</div>
+      <div class="split-name">LEG DAY</div>
+      <div class="split-count">3.1k workouts</div>
+    </div>
+    <div class="split-card">
+      <div class="split-emoji">🧘</div>
+      <div class="split-name">YOGA</div>
+      <div class="split-count">2.7k workouts</div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation — Search is active -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <span>Search</span>
+    </div>
+    <div class="nav-add">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span>Friends</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span>Profile</span>
+    </div>
+  </div>
+
+  <script>
+    function clearSearch() {
+      document.querySelector('.search-bar input').value = '';
+      document.querySelector('.search-bar input').focus();
+    }
+
+    function setChip(el) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function clearAllRecent() {
+      document.querySelector('.recent-list').innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
