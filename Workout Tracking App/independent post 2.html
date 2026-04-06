@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sessn — Workout Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      --accent: #635BFF;
+      --accent-light: #8B85FF;
+      --accent-glow: rgba(99, 91, 255, 0.35);
+      --accent-soft: rgba(99, 91, 255, 0.12);
+      --accent-border: rgba(99, 91, 255, 0.25);
+      --card-bg: #151515;
+      --card-border: rgba(255,255,255,0.06);
+      --lifting: #5B8CFF;
+      --lifting-soft: rgba(91,140,255,0.1);
+      --lifting-border: rgba(91,140,255,0.3);
+      --cardio: #5BDB6D;
+      --cardio-soft: rgba(91,219,109,0.1);
+      --cardio-border: rgba(91,219,109,0.3);
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px 0; font-size: 12px; font-weight: 600;
+    }
+    .status-time { font-size: 15px; font-weight: 700; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { width: 16px; height: 16px; fill: #fff; }
+
+    /* ── Top Header ── */
+    .top-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px 8px;
+    }
+    .back-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+      border: none;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.1); }
+    .back-btn svg { width: 20px; height: 20px; fill: rgba(255,255,255,0.7); }
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 2px;
+    }
+    .header-spacer { width: 40px; }
+
+    /* ── Step Indicator ── */
+    .step-indicator {
+      display: flex; gap: 4px;
+      padding: 8px 20px 16px;
+    }
+    .step-dot {
+      flex: 1; height: 3px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.08);
+    }
+    .step-dot.done { background: var(--accent); }
+    .step-dot.active { background: var(--accent-light); }
+
+    /* ── Section Label ── */
+    .section-label {
+      padding: 12px 20px 8px;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.3);
+    }
+    .section-title {
+      padding: 0 20px 4px;
+      font-size: 22px; font-weight: 700;
+    }
+    .section-subtitle {
+      padding: 0 20px 16px;
+      font-size: 13px; color: rgba(255,255,255,0.45);
+    }
+
+    /* ── Detail Section Divider ── */
+    .detail-section {
+      margin: 0 16px 20px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .detail-section-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px;
+      font-size: 14px; font-weight: 700;
+    }
+    .detail-section-header .badge {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .detail-section-header .badge.lifting {
+      background: var(--lifting-soft);
+      color: var(--lifting);
+      border: 1px solid var(--lifting-border);
+    }
+    .detail-section-header .badge.cardio {
+      background: var(--cardio-soft);
+      color: var(--cardio);
+      border: 1px solid var(--cardio-border);
+    }
+
+    /* ── Muscle Group Select ── */
+    .muscle-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 16px 16px;
+    }
+    .muscle-chip {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .muscle-chip:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    .muscle-chip.selected {
+      background: var(--lifting-soft);
+      border-color: var(--lifting-border);
+      color: var(--lifting);
+    }
+
+    /* ── Exercise Entry ── */
+    .exercise-entries {
+      padding: 0 16px 12px;
+    }
+    .exercise-entry {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .exercise-entry:last-child { border-bottom: none; }
+    .exercise-num {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: var(--lifting-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px; color: var(--lifting);
+      flex-shrink: 0;
+    }
+    .exercise-fields { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .exercise-name-input {
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px; font-weight: 600; color: #fff;
+    }
+    .exercise-name-input::placeholder { color: rgba(255,255,255,0.2); }
+    .exercise-sets-row {
+      display: flex; gap: 8px;
+    }
+    .mini-field {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .mini-field span {
+      font-size: 10px; color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .mini-input {
+      width: 36px;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 600; color: #fff;
+      text-align: center;
+    }
+    .mini-input::placeholder { color: rgba(255,255,255,0.15); }
+    .remove-exercise {
+      background: none; border: none; cursor: pointer;
+      padding: 4px; flex-shrink: 0;
+    }
+    .remove-exercise svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.15); }
+    .remove-exercise:hover svg { fill: rgba(255,255,255,0.4); }
+
+    /* ── Add Exercise Button ── */
+    .add-exercise-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 16px;
+      margin: 0 16px 16px;
+      border-radius: 12px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all 0.2s;
+    }
+    .add-exercise-btn svg { width: 16px; height: 16px; }
+    .add-exercise-btn.lifting-add {
+      background: var(--lifting-soft);
+      color: var(--lifting);
+      border: 1px dashed var(--lifting-border);
+    }
+    .add-exercise-btn.lifting-add svg { fill: var(--lifting); }
+    .add-exercise-btn.lifting-add:hover { background: rgba(91,140,255,0.15); }
+
+    /* ── Set Type Toggle (dropset/superset) ── */
+    .set-type-row {
+      display: flex; gap: 6px;
+      margin-top: 4px;
+    }
+    .set-type-chip {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .set-type-chip:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+    .set-type-chip.active {
+      background: rgba(255,165,0,0.12);
+      border-color: rgba(255,165,0,0.35);
+      color: #FFA500;
+    }
+    .set-type-chip.active.superset {
+      background: rgba(0,200,150,0.12);
+      border-color: rgba(0,200,150,0.35);
+      color: #00C896;
+    }
+
+    /* ── Dropset Sub-menu ── */
+    .dropset-detail {
+      display: none;
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: rgba(255,165,0,0.06);
+      border: 1px solid rgba(255,165,0,0.2);
+      border-radius: 8px;
+    }
+    .dropset-detail.visible { display: block; }
+    .dropset-detail-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #FFA500;
+      margin-bottom: 6px;
+    }
+    .dropset-fields {
+      display: flex; gap: 6px;
+    }
+    .dropset-field {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,165,0,0.15);
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .dropset-field span {
+      font-size: 9px; color: rgba(255,165,0,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .dropset-input {
+      width: 32px;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 600; color: #FFA500;
+      text-align: center;
+    }
+    .dropset-input::placeholder { color: rgba(255,165,0,0.25); }
+
+    /* ── Superset Sub-menu ── */
+    .superset-detail {
+      display: none;
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: rgba(0,200,150,0.06);
+      border: 1px solid rgba(0,200,150,0.2);
+      border-radius: 8px;
+    }
+    .superset-detail.visible { display: block; }
+    .superset-detail-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #00C896;
+      margin-bottom: 6px;
+    }
+    .superset-name-input {
+      width: 100%;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 600; color: #fff;
+      margin-bottom: 6px;
+    }
+    .superset-name-input::placeholder { color: rgba(255,255,255,0.15); }
+    .superset-fields {
+      display: flex; gap: 6px;
+    }
+    .superset-field {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,200,150,0.15);
+      border-radius: 6px;
+      padding: 5px 8px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .superset-field span {
+      font-size: 9px; color: rgba(0,200,150,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .superset-input {
+      width: 32px;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 600; color: #00C896;
+      text-align: center;
+    }
+    .superset-input::placeholder { color: rgba(0,200,150,0.25); }
+
+    /* ── Warmup Box ── */
+    .warmup-box {
+      margin: 0 16px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: none;
+    }
+    .warmup-box.visible { display: block; }
+    .warmup-box-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 6px;
+    }
+    .warmup-input {
+      width: 100%;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 500; color: #fff;
+      resize: none; min-height: 48px;
+    }
+    .warmup-input::placeholder { color: rgba(255,255,255,0.15); }
+
+    /* ── Cardio Section ── */
+    .cardio-type-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 16px 16px;
+    }
+    .cardio-chip {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px; font-weight: 600;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cardio-chip:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    .cardio-chip.selected {
+      background: var(--cardio-soft);
+      border-color: var(--cardio-border);
+      color: var(--cardio);
+    }
+
+    .cardio-detail-row {
+      display: flex; gap: 10px;
+      padding: 0 16px 16px;
+    }
+    .cardio-field {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .cardio-field-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 4px;
+    }
+    .cardio-field-input {
+      width: 100%;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px; font-weight: 600; color: #fff;
+    }
+    .cardio-field-input::placeholder { color: rgba(255,255,255,0.15); }
+
+    /* ── Tag Users ── */
+    .tag-section {
+      margin: 0 16px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .tag-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 6px;
+    }
+    .tag-input {
+      width: 100%;
+      background: none; border: none; outline: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px; font-weight: 500; color: #fff;
+    }
+    .tag-input::placeholder { color: rgba(255,255,255,0.2); }
+    .tag-optional {
+      font-size: 10px; color: rgba(255,255,255,0.2);
+      margin-top: 6px;
+    }
+
+    /* ── Post Button ── */
+    .post-btn-container {
+      padding: 8px 16px 120px;
+    }
+    .post-btn {
+      width: 100%;
+      padding: 14px 0;
+      border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px; font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .post-btn:hover { background: var(--accent-light); }
+    .post-btn:active { transform: scale(0.98); }
+
+    /* ── Bottom Nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 8px 12px 28px; z-index: 100;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; padding: 6px 12px; transition: color 0.2s;
+    }
+    .nav-item svg { width: 24px; height: 24px; fill: rgba(255,255,255,0.35); }
+    .nav-item span { font-size: 10px; color: rgba(255,255,255,0.35); font-weight: 500; }
+    .nav-add {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -24px; cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      border: 3px solid var(--accent-light);
+    }
+    .nav-add svg { width: 28px; height: 28px; fill: #fff; }
+
+    ::-webkit-scrollbar { width: 0; }
+
+    @media (min-width: 500px) {
+      body {
+        border-left: 3px solid rgba(255,255,255,0.08);
+        border-right: 3px solid rgba(255,255,255,0.08);
+        box-shadow: 0 0 80px rgba(0,0,0,0.5);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.34C7 21.4 7.6 22 8.33 22h7.34c.73 0 1.33-.6 1.33-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Top Header -->
+  <div class="top-header">
+    <button class="back-btn" onclick="history.back()">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <div class="header-title">WORKOUT DETAILS</div>
+    <div class="header-spacer"></div>
+  </div>
+
+  <!-- Step Indicator (Step 7 of 7 — final) -->
+  <div class="step-indicator">
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- LIFTING SECTION                -->
+  <!-- ═══════════════════════════════ -->
+  <div class="detail-section">
+    <div class="detail-section-header">
+      <span class="badge lifting">&#127947; Lifting</span>
+    </div>
+
+    <!-- Muscle Groups -->
+    <div style="padding: 0 16px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3);">Muscle Groups</div>
+    <div class="muscle-grid">
+      <div class="muscle-chip selected" onclick="this.classList.toggle('selected')">Chest</div>
+      <div class="muscle-chip selected" onclick="this.classList.toggle('selected')">Back</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Shoulders</div>
+      <div class="muscle-chip selected" onclick="this.classList.toggle('selected')">Biceps</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Triceps</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Quads</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Hamstrings</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Glutes</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Core</div>
+      <div class="muscle-chip" onclick="this.classList.toggle('selected')">Calves</div>
+    </div>
+
+    <!-- Warmup Toggle -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 16px 14px;">
+      <span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6);">Include Warmup</span>
+      <div id="warmupToggle" style="width: 44px; height: 24px; border-radius: 12px; background: var(--lifting); cursor: pointer; position: relative; transition: background 0.2s;" onclick="toggleWarmup(this)">
+        <div id="warmupKnob" style="width: 20px; height: 20px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 22px; transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);"></div>
+      </div>
+    </div>
+
+    <!-- Warmup Description Box -->
+    <div class="warmup-box visible" id="warmupBox">
+      <div class="warmup-box-label">Describe your warmup</div>
+      <textarea class="warmup-input" placeholder="e.g. 5 min treadmill, arm circles, light bench press..."></textarea>
+    </div>
+
+    <!-- Exercises -->
+    <div style="padding: 0 16px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3);">Exercises</div>
+    <div class="exercise-entries">
+      <div class="exercise-entry">
+        <div class="exercise-num">1</div>
+        <div class="exercise-fields">
+          <input class="exercise-name-input" type="text" placeholder="Exercise name..." value="Barbell Bench Press">
+          <div class="exercise-sets-row">
+            <div class="mini-field">
+              <span>Sets</span>
+              <input class="mini-input" type="text" value="4">
+            </div>
+            <div class="mini-field">
+              <span>Reps</span>
+              <input class="mini-input" type="text" value="10">
+            </div>
+            <div class="mini-field">
+              <span>Lbs</span>
+              <input class="mini-input" type="text" value="185">
+            </div>
+          </div>
+          <div class="set-type-row">
+            <div class="set-type-chip active" onclick="toggleSetType(this)">Dropset</div>
+            <div class="set-type-chip superset" onclick="toggleSetType(this)">Superset</div>
+          </div>
+          <div class="dropset-detail visible">
+            <div class="dropset-detail-label">Dropset</div>
+            <div class="dropset-fields">
+              <div class="dropset-field">
+                <span>Starting on set</span>
+                <input class="dropset-input" type="text" value="4" placeholder="—">
+              </div>
+              <div class="dropset-field">
+                <span>Reps</span>
+                <input class="dropset-input" type="text" value="12" placeholder="—">
+              </div>
+              <div class="dropset-field">
+                <span>Lbs</span>
+                <input class="dropset-input" type="text" value="135" placeholder="—">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="remove-exercise">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="exercise-entry">
+        <div class="exercise-num">2</div>
+        <div class="exercise-fields">
+          <input class="exercise-name-input" type="text" placeholder="Exercise name..." value="Barbell Rows">
+          <div class="exercise-sets-row">
+            <div class="mini-field">
+              <span>Sets</span>
+              <input class="mini-input" type="text" value="4">
+            </div>
+            <div class="mini-field">
+              <span>Reps</span>
+              <input class="mini-input" type="text" value="10">
+            </div>
+            <div class="mini-field">
+              <span>Lbs</span>
+              <input class="mini-input" type="text" value="135">
+            </div>
+          </div>
+          <div class="set-type-row">
+            <div class="set-type-chip" onclick="toggleSetType(this)">Dropset</div>
+            <div class="set-type-chip superset" onclick="toggleSetType(this)">Superset</div>
+          </div>
+        </div>
+        <button class="remove-exercise">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="exercise-entry">
+        <div class="exercise-num">3</div>
+        <div class="exercise-fields">
+          <input class="exercise-name-input" type="text" placeholder="Exercise name..." value="Dumbbell Curls">
+          <div class="exercise-sets-row">
+            <div class="mini-field">
+              <span>Sets</span>
+              <input class="mini-input" type="text" value="3">
+            </div>
+            <div class="mini-field">
+              <span>Reps</span>
+              <input class="mini-input" type="text" value="12">
+            </div>
+            <div class="mini-field">
+              <span>Lbs</span>
+              <input class="mini-input" type="text" value="30">
+            </div>
+          </div>
+          <div class="set-type-row">
+            <div class="set-type-chip" onclick="toggleSetType(this)">Dropset</div>
+            <div class="set-type-chip superset active" onclick="toggleSetType(this)">Superset</div>
+          </div>
+          <div class="superset-detail visible">
+            <div class="superset-detail-label">Superset with</div>
+            <input class="superset-name-input" type="text" placeholder="Exercise name..." value="Hammer Curls">
+            <div class="superset-fields">
+              <div class="superset-field">
+                <span>Sets</span>
+                <input class="superset-input" type="text" value="3" placeholder="—">
+              </div>
+              <div class="superset-field">
+                <span>Reps</span>
+                <input class="superset-input" type="text" value="10" placeholder="—">
+              </div>
+              <div class="superset-field">
+                <span>Lbs</span>
+                <input class="superset-input" type="text" value="25" placeholder="—">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="remove-exercise">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="exercise-entry">
+        <div class="exercise-num">4</div>
+        <div class="exercise-fields">
+          <input class="exercise-name-input" type="text" placeholder="Exercise name...">
+          <div class="exercise-sets-row">
+            <div class="mini-field">
+              <span>Sets</span>
+              <input class="mini-input" type="text" placeholder="—">
+            </div>
+            <div class="mini-field">
+              <span>Reps</span>
+              <input class="mini-input" type="text" placeholder="—">
+            </div>
+            <div class="mini-field">
+              <span>Lbs</span>
+              <input class="mini-input" type="text" placeholder="—">
+            </div>
+          </div>
+          <div class="set-type-row">
+            <div class="set-type-chip" onclick="toggleSetType(this)">Dropset</div>
+            <div class="set-type-chip superset" onclick="toggleSetType(this)">Superset</div>
+          </div>
+        </div>
+        <button class="remove-exercise">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="add-exercise-btn lifting-add">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Add Exercise
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- CARDIO SECTION                 -->
+  <!-- ═══════════════════════════════ -->
+  <div class="detail-section">
+    <div class="detail-section-header">
+      <span class="badge cardio">&#127939; Cardio</span>
+    </div>
+
+    <!-- Cardio Type Checklist -->
+    <div style="padding: 0 16px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3);">Type</div>
+    <div class="cardio-type-grid">
+      <div class="cardio-chip selected" onclick="this.classList.toggle('selected')">Running</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Cycling</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Swimming</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Rowing</div>
+      <div class="cardio-chip selected" onclick="this.classList.toggle('selected')">Stairmaster</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Elliptical</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Jump Rope</div>
+      <div class="cardio-chip" onclick="this.classList.toggle('selected')">Walking</div>
+    </div>
+
+    <!-- Cardio Details -->
+    <div style="padding: 0 16px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3);">Details</div>
+    <div class="cardio-detail-row">
+      <div class="cardio-field">
+        <div class="cardio-field-label">Duration</div>
+        <input class="cardio-field-input" type="text" placeholder="e.g. 20 min" value="15 min">
+      </div>
+      <div class="cardio-field">
+        <div class="cardio-field-label">Distance</div>
+        <input class="cardio-field-input" type="text" placeholder="e.g. 2 mi">
+      </div>
+      <div class="cardio-field">
+        <div class="cardio-field-label">Calories</div>
+        <input class="cardio-field-input" type="text" placeholder="e.g. 200">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Users -->
+  <div class="section-label">Optional</div>
+  <div class="tag-section">
+    <div class="tag-label">Tag Users</div>
+    <input class="tag-input" type="text" placeholder="@username">
+    <div class="tag-optional">Tag friends who were part of this sessn</div>
+  </div>
+
+  <!-- Post Button -->
+  <div class="post-btn-container">
+    <button class="post-btn">Post Sessn</button>
+  </div>
+
+  <!-- Bottom Navigation — Plus highlighted -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <span>Search</span>
+    </div>
+    <div class="nav-add">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span>Friends</span>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span>Profile</span>
+    </div>
+  </div>
+
+  <script>
+    function toggleSetType(chip) {
+      chip.classList.toggle('active');
+    }
+
+    function toggleWarmup(toggle) {
+      toggle.classList.toggle('off');
+      const knob = document.getElementById('warmupKnob');
+      const box = document.getElementById('warmupBox');
+      if (toggle.classList.contains('off')) {
+        toggle.style.background = 'rgba(255,255,255,0.12)';
+        knob.style.left = '2px';
+        box.classList.remove('visible');
+      } else {
+        toggle.style.background = 'var(--lifting)';
+        knob.style.left = '22px';
+        box.classList.add('visible');
+      }
+    }
+  </script>
+
+</body>
+</html>
