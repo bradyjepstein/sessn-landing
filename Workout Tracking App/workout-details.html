@@ -240,11 +240,13 @@
       padding: 0 20px;
     }
     .exercise-item {
-      display: flex; align-items: center; gap: 14px;
       padding: 14px 0;
       border-bottom: 1px solid var(--card-border);
     }
     .exercise-item:last-child { border-bottom: none; }
+    .exercise-row {
+      display: flex; align-items: center; gap: 14px;
+    }
     .exercise-num {
       width: 28px; height: 28px; border-radius: 8px;
       background: var(--accent-soft);
@@ -253,7 +255,7 @@
       font-size: 15px; color: var(--accent-light);
       flex-shrink: 0;
     }
-    .exercise-info { flex: 1; }
+    .exercise-info { flex: 1; min-width: 0; }
     .exercise-name {
       font-size: 14px; font-weight: 600; color: #fff;
     }
@@ -264,6 +266,72 @@
     .exercise-weight {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 18px; color: rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    /* ── Dropset annotation ── */
+    .dropset-block {
+      margin-top: 8px;
+      margin-left: 42px;
+      padding: 8px 12px;
+      background: rgba(255,165,0,0.06);
+      border: 1px solid rgba(255,165,0,0.25);
+      border-radius: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dropset-tag {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #FFA500;
+      padding: 3px 8px;
+      background: rgba(255,165,0,0.12);
+      border: 1px solid rgba(255,165,0,0.3);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .dropset-info {
+      flex: 1;
+      font-size: 12px;
+      color: rgba(255,165,0,0.85);
+    }
+    .dropset-info strong { color: #FFA500; font-weight: 700; }
+
+    /* ── Superset annotation ── */
+    .superset-block {
+      margin-top: 8px;
+      margin-left: 42px;
+      padding: 10px 12px;
+      background: rgba(0,200,150,0.06);
+      border: 1px solid rgba(0,200,150,0.25);
+      border-radius: 10px;
+    }
+    .superset-tag {
+      display: inline-block;
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #00C896;
+      padding: 3px 8px;
+      background: rgba(0,200,150,0.12);
+      border: 1px solid rgba(0,200,150,0.3);
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    .superset-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .superset-name {
+      flex: 1;
+      font-size: 13px; font-weight: 600; color: #fff;
+    }
+    .superset-detail {
+      font-size: 11px; color: rgba(0,200,150,0.7);
+      margin-top: 2px;
+    }
+    .superset-weight {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; color: #00C896;
       flex-shrink: 0;
     }
 
@@ -381,7 +449,7 @@
   </div>
 
   <!-- Overlay Backdrop -->
-  <div class="overlay-backdrop" onclick="closePanel()"></div>
+  <div class="overlay-backdrop" onclick="location.href='home.html'"></div>
 
   <!-- Drop-Up Workout Details Panel -->
   <div class="dropup-panel">
@@ -400,74 +468,112 @@
 
     <div class="exercise-list">
       <div class="exercise-item">
-        <div class="exercise-num">1</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Barbell Rows</div>
-          <div class="exercise-detail">4 sets &times; 10 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">1</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Barbell Rows</div>
+            <div class="exercise-detail">4 sets &times; 10 reps</div>
+          </div>
+          <div class="exercise-weight">135 LB</div>
         </div>
-        <div class="exercise-weight">135 LB</div>
       </div>
+
       <div class="exercise-item">
-        <div class="exercise-num">2</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Lat Pulldowns</div>
-          <div class="exercise-detail">4 sets &times; 12 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">2</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Lat Pulldowns</div>
+            <div class="exercise-detail">4 sets &times; 12 reps</div>
+          </div>
+          <div class="exercise-weight">120 LB</div>
         </div>
-        <div class="exercise-weight">120 LB</div>
+        <!-- Dropset on the last set -->
+        <div class="dropset-block">
+          <div class="dropset-tag">Dropset</div>
+          <div class="dropset-info">Starting on set <strong>4</strong> &bull; <strong>15 reps</strong> &bull; <strong>80 lb</strong></div>
+        </div>
       </div>
+
       <div class="exercise-item">
-        <div class="exercise-num">3</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Seated Cable Rows</div>
-          <div class="exercise-detail">3 sets &times; 12 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">3</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Seated Cable Rows</div>
+            <div class="exercise-detail">3 sets &times; 12 reps</div>
+          </div>
+          <div class="exercise-weight">110 LB</div>
         </div>
-        <div class="exercise-weight">110 LB</div>
       </div>
+
       <div class="exercise-item">
-        <div class="exercise-num">4</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Face Pulls</div>
-          <div class="exercise-detail">3 sets &times; 15 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">4</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Face Pulls</div>
+            <div class="exercise-detail">3 sets &times; 15 reps</div>
+          </div>
+          <div class="exercise-weight">40 LB</div>
         </div>
-        <div class="exercise-weight">40 LB</div>
       </div>
+
       <div class="exercise-item">
-        <div class="exercise-num">5</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Dumbbell Curls</div>
-          <div class="exercise-detail">3 sets &times; 12 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">5</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Dumbbell Curls</div>
+            <div class="exercise-detail">3 sets &times; 12 reps</div>
+          </div>
+          <div class="exercise-weight">30 LB</div>
         </div>
-        <div class="exercise-weight">30 LB</div>
+        <!-- Superset with Hammer Curls -->
+        <div class="superset-block">
+          <div class="superset-tag">Superset with</div>
+          <div class="superset-row">
+            <div class="superset-name">
+              Hammer Curls
+              <div class="superset-detail">3 sets &times; 10 reps</div>
+            </div>
+            <div class="superset-weight">25 LB</div>
+          </div>
+        </div>
       </div>
+
       <div class="exercise-item">
-        <div class="exercise-num">6</div>
-        <div class="exercise-info">
-          <div class="exercise-name">Hammer Curls</div>
-          <div class="exercise-detail">3 sets &times; 10 reps</div>
+        <div class="exercise-row">
+          <div class="exercise-num">6</div>
+          <div class="exercise-info">
+            <div class="exercise-name">Preacher Curls</div>
+            <div class="exercise-detail">3 sets &times; 10 reps</div>
+          </div>
+          <div class="exercise-weight">45 LB</div>
         </div>
-        <div class="exercise-weight">25 LB</div>
+        <!-- Dropset on the last set -->
+        <div class="dropset-block">
+          <div class="dropset-tag">Dropset</div>
+          <div class="dropset-info">Starting on set <strong>3</strong> &bull; <strong>12 reps</strong> &bull; <strong>30 lb</strong></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Bottom Navigation — Home active -->
   <div class="bottom-nav" style="z-index: 50;">
-    <div class="nav-item active">
+    <div class="nav-item active" onclick="location.href='home.html'">
       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       <span>Home</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='search.html'">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       <span>Search</span>
     </div>
-    <div class="nav-add">
+    <div class="nav-add" onclick="location.href='independent post 1.html'">
       <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='friends leaderboard.html'">
       <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      <span>Friends</span>
+      <span>Community</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='profile.html'">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       <span>Profile</span>
     </div>

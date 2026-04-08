@@ -79,7 +79,13 @@
       border: 1px solid var(--accent-border);
       border-radius: 16px; padding: 14px 18px;
       display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
     }
+    .streak-banner:hover {
+      background: linear-gradient(135deg, rgba(99,91,255,0.2), rgba(99,91,255,0.08));
+    }
+    .streak-banner:active { transform: scale(0.99); }
     .streak-info { display: flex; align-items: center; gap: 12px; }
     .streak-fire { font-size: 28px; }
     .streak-text { font-size: 13px; color: rgba(255,255,255,0.6); }
@@ -266,7 +272,7 @@
   </div>
 
   <div class="top-header">
-    <div class="top-header-left">
+    <div class="top-header-left" onclick="location.href='profile.html'" style="cursor:pointer;">
       <div class="avatar">B</div>
       <div class="greeting">
         <strong>Brady</strong>
@@ -281,7 +287,7 @@
   </div>
 
   <!-- Streak Banner -->
-  <div class="streak-banner">
+  <div class="streak-banner" onclick="location.href='streak.html'">
     <div class="streak-info">
       <div class="streak-fire">&#128293;</div>
       <div class="streak-text">
@@ -315,7 +321,7 @@
         <div class="card-location">&#128205; Strawberry Field</div>
         <div class="card-workout-title">POST THANKSGIVING WORKOUT</div>
       </div>
-      <div class="card-username-row"><span>bradyepstein</span><span class="card-username-date">11/28/25</span></div>
+      <div class="card-username-row"><span><a href="profile.html" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;">bradyepstein</a></span><span class="card-username-date">11/28/25</span></div>
       <div class="card-stats">
         <div class="card-stat">
           <div class="card-stat-label">Split</div>
@@ -342,7 +348,7 @@
           <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/></svg>
         </button>
       </div>
-      <div class="card-caption"><strong>bradyepstein</strong> Burning off that turkey. No days off.</div>
+      <div class="card-caption">Burning off that turkey. No days off.</div>
       <div class="card-tap-hint" onclick="event.stopPropagation();location.href='workout-details.html'">Tap to see workout details &rsaquo;</div>
     </div>
 
@@ -353,7 +359,7 @@
         <div class="card-location">&#128205; Wells Ave YMCA</div>
         <div class="card-workout-title">WEDNESDAY PULL DAY</div>
       </div>
-      <div class="card-username-row"><span>bradyepstein</span><span class="card-username-date">5/24/25</span></div>
+      <div class="card-username-row"><span><a href="profile.html" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;">bradyepstein</a></span><span class="card-username-date">5/24/25</span></div>
       <div class="card-stats">
         <div class="card-stat">
           <div class="card-stat-label">Split</div>
@@ -380,7 +386,7 @@
           <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/></svg>
         </button>
       </div>
-      <div class="card-caption"><strong>bradyepstein</strong> Back is getting wide. Trust the process.</div>
+      <div class="card-caption">Back is getting wide. Trust the process.</div>
       <div class="card-tap-hint" onclick="event.stopPropagation();location.href='workout-details.html'">Tap to see workout details &rsaquo;</div>
     </div>
 
@@ -418,7 +424,7 @@
           <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/></svg>
         </button>
       </div>
-      <div class="card-caption"><strong>lydiakoehler</strong> Glute pump was unreal today.</div>
+      <div class="card-caption">Glute pump was unreal today.</div>
       <div class="card-tap-hint" onclick="event.stopPropagation();location.href='workout-details.html'">Tap to see workout details &rsaquo;</div>
     </div>
 

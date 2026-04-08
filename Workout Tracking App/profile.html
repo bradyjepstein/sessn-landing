@@ -201,6 +201,72 @@
     }
     .grid-meta svg { width: 10px; height: 10px; fill: #FF4D6A; }
 
+    /* ── Saved Workouts ── */
+    .saved-list {
+      padding: 12px 16px 120px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .saved-list.active { display: flex; }
+    .posts-grid.hidden { display: none; }
+
+    .saved-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .saved-item:active { transform: scale(0.98); }
+    .saved-item:hover { border-color: var(--accent-border); }
+    .saved-thumb {
+      width: 56px; height: 56px; border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .saved-info { flex: 1; min-width: 0; }
+    .saved-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 17px; letter-spacing: 0.8px;
+      margin-bottom: 3px;
+    }
+    .saved-meta {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .saved-meta-dot {
+      width: 3px; height: 3px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+    }
+    .saved-author {
+      font-size: 11px;
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .saved-bookmark {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: 1px solid var(--accent-border);
+    }
+    .saved-bookmark svg { width: 14px; height: 14px; fill: var(--accent-light); }
+
+    .saved-empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255,255,255,0.3);
+      font-size: 13px;
+    }
+
     /* ── Bottom Nav ── */
     .bottom-nav {
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -255,7 +321,7 @@
   <!-- SESSN Logo + Settings -->
   <div style="padding: 18px 20px 0; display: flex; align-items: center; justify-content: center; position: relative;">
     <span style="font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 4px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SESSN</span>
-    <div style="position: absolute; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+    <div onclick="location.href='settings.html'" style="position: absolute; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z"/></svg>
     </div>
   </div>
@@ -271,7 +337,7 @@
   <!-- Action Buttons -->
   <div class="profile-actions">
     <button class="profile-btn primary">Edit Profile</button>
-    <button class="profile-btn secondary">Share Profile</button>
+    <button class="profile-btn secondary" onclick="location.href='share home.html'">Share Profile</button>
   </div>
 
   <!-- Stats -->
@@ -297,10 +363,6 @@
       Posts
     </div>
     <div class="profile-tab" onclick="setTab(this)">
-      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Group
-    </div>
-    <div class="profile-tab" onclick="setTab(this)">
       <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
       Reposts
     </div>
@@ -311,8 +373,8 @@
   </div>
 
   <!-- Posts Grid -->
-  <div class="posts-grid">
-    <div class="grid-item">
+  <div class="posts-grid" id="posts-grid">
+    <div class="grid-item" onclick="location.href='post-expansion.html'">
       <img src="Images/post-thanksgiving.jpg" alt="Post Thanksgiving Workout" style="object-position: center 30%;">
       <div class="grid-overlay">
         <div class="grid-title">CHEST & TRIS</div>
@@ -322,7 +384,7 @@
         </div>
       </div>
     </div>
-    <div class="grid-item">
+    <div class="grid-item" onclick="location.href='post-expansion.html'">
       <img src="Images/pull-day.jpg" alt="Wednesday Pull Day" style="object-position: center 55%;">
       <div class="grid-overlay">
         <div class="grid-title">BACK & BIS</div>
@@ -334,24 +396,101 @@
     </div>
   </div>
 
+  <!-- Saved Workouts List -->
+  <div class="saved-list" id="saved-list">
+
+    <div class="saved-item">
+      <img class="saved-thumb" src="Images/pull-day.jpg" alt="" style="object-position: center 55%;">
+      <div class="saved-info">
+        <div class="saved-title">WEDNESDAY PULL DAY</div>
+        <div class="saved-meta">
+          <span>Back & Bis</span>
+          <span class="saved-meta-dot"></span>
+          <span>55 min</span>
+          <span class="saved-meta-dot"></span>
+          <span>6 exercises</span>
+        </div>
+        <div class="saved-author">@lydiakoehler</div>
+      </div>
+      <div class="saved-bookmark">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+    </div>
+
+    <div class="saved-item">
+      <img class="saved-thumb" src="Images/leg-day.jpg" alt="" style="object-position: center 15%;">
+      <div class="saved-info">
+        <div class="saved-title">FRIDAY LEG DAY</div>
+        <div class="saved-meta">
+          <span>Quads & Glutes</span>
+          <span class="saved-meta-dot"></span>
+          <span>47 min</span>
+          <span class="saved-meta-dot"></span>
+          <span>7 exercises</span>
+        </div>
+        <div class="saved-author">@lydiakoehler</div>
+      </div>
+      <div class="saved-bookmark">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+    </div>
+
+    <div class="saved-item">
+      <img class="saved-thumb" src="Images/post-thanksgiving.jpg" alt="" style="object-position: center 30%;">
+      <div class="saved-info">
+        <div class="saved-title">PUSH DAY PUMP</div>
+        <div class="saved-meta">
+          <span>Chest & Tris</span>
+          <span class="saved-meta-dot"></span>
+          <span>50 min</span>
+          <span class="saved-meta-dot"></span>
+          <span>8 exercises</span>
+        </div>
+        <div class="saved-author">@dschwartz42</div>
+      </div>
+      <div class="saved-bookmark">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+    </div>
+
+    <div class="saved-item">
+      <img class="saved-thumb" src="Images/pull-day.jpg" alt="" style="object-position: center 35%;">
+      <div class="saved-info">
+        <div class="saved-title">SHOULDER DESTROYER</div>
+        <div class="saved-meta">
+          <span>Shoulders</span>
+          <span class="saved-meta-dot"></span>
+          <span>40 min</span>
+          <span class="saved-meta-dot"></span>
+          <span>5 exercises</span>
+        </div>
+        <div class="saved-author">@arod.fitness</div>
+      </div>
+      <div class="saved-bookmark">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+    </div>
+
+  </div>
+
   <!-- Bottom Navigation — Profile is active -->
   <div class="bottom-nav">
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='home.html'">
       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       <span>Home</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='search.html'">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       <span>Search</span>
     </div>
-    <div class="nav-add">
+    <div class="nav-add" onclick="location.href='independent post 1.html'">
       <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" onclick="location.href='friends leaderboard.html'">
       <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      <span>Friends</span>
+      <span>Community</span>
     </div>
-    <div class="nav-item active">
+    <div class="nav-item active" onclick="location.href='profile.html'">
       <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       <span>Profile</span>
     </div>
@@ -361,6 +500,18 @@
     function setTab(el) {
       document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
+
+      const postsGrid = document.getElementById('posts-grid');
+      const savedList = document.getElementById('saved-list');
+      const label = el.textContent.trim();
+
+      if (label === 'Saved') {
+        postsGrid.classList.add('hidden');
+        savedList.classList.add('active');
+      } else {
+        postsGrid.classList.remove('hidden');
+        savedList.classList.remove('active');
+      }
     }
 
     function toggleLike(btn) {
